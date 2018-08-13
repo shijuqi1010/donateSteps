@@ -1,0 +1,11 @@
+{
+  "todaySteps": 4800,
+  "data": {
+    "donatedSteps": 30000,
+    "donatedMoney": 3,
+    "rank": 2,
+    "leftMoney": 20000,
+    "targetDonateMoney": 50000
+  },
+  "todayDonatedSteps" : 0
+}

@@ -18,7 +18,7 @@
             </span>
             <span v-else>
               <p class="today-steps">今日步数</p>
-              <p>{{ totalSteps }}</p>
+              <p>{{ todaySteps }}</p>
             </span>
           </x-circle>
         </div>
@@ -47,15 +47,15 @@
       </div>
       <ul class="donate-info">
         <li>
-            <p class="donate-data">1000步</p>
+            <p class="donate-data">{{ donatedSteps.donatedSteps }}步</p>
             <p class="donate-text">我已捐赠</p>
         </li>
         <li>
-            <p class="donate-data">10元</p>
+            <p class="donate-data">{{ donatedSteps.donatedMoney }}元</p>
             <p class="donate-text">累计金额</p>
         </li>
         <li>
-          <p class="donate-data">第999名</p>
+          <p class="donate-data">第{{ donatedSteps.rank }}名</p>
           <p class="donate-text">社区排名</p>
         </li>
       </ul>
@@ -65,9 +65,9 @@
       <div class="donate-title">
         援助山区贫困儿童
       </div>
-      <p class="need-steps">距离目标还有{{ needSteps }}元</p>
+      <p class="need-steps">距离目标还有{{ donatedSteps.leftMoney }}元</p>
       <x-progress :percent="goalPercent" :show-cancel="false" class="donate-progress"></x-progress>
-      <p class="goal-steps">捐赠目标:50000元</p>
+      <p class="goal-steps">捐赠目标:{{ donatedSteps.targetDonateMoney }}元</p>
     </div>
 
     <div class="explain">
@@ -183,6 +183,7 @@
         .donate-data{
           font-size: 18px;
           color: #333333;
+          padding-bottom: 10px;
         }
         .donate-text{
           font-size: 12px;
@@ -210,6 +211,7 @@
     }
     .donate-progress{
       margin: 10px 0 ;
+      // z-index: 100px;
       // border: 2px solid rgba(255,209,0,1);
     }
     .goal-steps{
@@ -241,6 +243,8 @@
 
 <script>
 import { XCircle, XButton, XProgress } from 'vux'
+import Axios from 'axios'
+import Util from 'utils/utils'
 export default {
   components: {
     XCircle,
@@ -249,42 +253,56 @@ export default {
   },
   data () {
     return {
-      totalSteps: 2000,
+      todaySteps: 2000,
+      donatedSteps: '',
+      // donatedSteps: 0,
+      // donatedMoney: 0,
+      // rank: 1,
       // needSteps: 20,
+      url: `http://activity.aylives.cn/donateSteps/h5/index?steps=${600}&encyptSteps=${88}`,
+      encyptSteps: 0,
       stepNote: '0',
       isDonated: false
     }
+  },
+  created () {
+    this.init()
   },
   computed: {
     percent () {
       if (this.isDonated) {
         return 0
       } else {
-        return this.totalSteps / 50000 * 100
+        if (this.todaySteps >= 50000) {
+          return 100
+        } else {
+          return this.todaySteps / 50000 * 100
+        }
       }
     },
     goalPercent () {
-      return this.totalSteps / 200000 * 100
+      let totalDonatedMoney = this.donatedSteps.targetDonateMoney - this.donatedSteps.leftMoney
+      return totalDonatedMoney / this.donatedSteps.targetDonateMoney * 100
     },
     needSteps () {
-      if (this.totalSteps < 100) {
+      if (this.todaySteps < 100) {
         this.stepNote = '0'
-        return 100 - this.totalSteps
-      } else if (this.totalSteps > 100 && this.totalSteps < 5000) {
+        return 100 - this.todaySteps
+      } else if (this.todaySteps > 100 && this.todaySteps < 5000) {
         this.stepNote = '1'
-        return 5000 - this.totalSteps
-      } else if (this.totalSteps > 5000 && this.totalSteps < 10000) {
+        return 5000 - this.todaySteps
+      } else if (this.todaySteps > 5000 && this.todaySteps < 10000) {
         this.stepNote = '2'
-        return 10000 - this.totalSteps
-      } else if (this.totalSteps > 10000 && this.totalSteps < 50000) {
+        return 10000 - this.todaySteps
+      } else if (this.todaySteps > 10000 && this.todaySteps < 50000) {
         this.stepNote = '3'
-        return 50000 - this.totalSteps
+        return 50000 - this.todaySteps
       } else {
         return 0
       }
     },
     clickAble () {
-      if (this.totalSteps > 100 && !this.isDonated) {
+      if (this.todaySteps > 100 && !this.isDonated) {
         return true
       } else {
         return false
@@ -292,18 +310,41 @@ export default {
     }
   },
   methods: {
+    init () {
+      // 获取app传过来的步数
+      this.todaySteps = this.getParam()[0].split('=', 2)[1]
+      this.encyptSteps = this.getParam()[1].split('=', 2)[1]
+      this.getDonateData()
+    },
+    getParam () {
+      // http://donatesteps.frp.aylives.cn:8000/#/donateSteps?steps=2000&encyptSteps=88
+      let href = window.location.href
+      // 拆分url获取步数
+      let data = href.split('?', 2)[1].split('&', 2)
+      return data
+    },
+    getDonateData () {
+      let token = Util.getCookie('token')
+      let params = {
+        params: {token: token}
+      }
+      Axios.get('src/donateSteps/data.json', params).then(res => {
+        if (res.data && res.data.data) {
+          this.donatedSteps = res.data.data
+        }
+      })
+    },
     donateSteps () {
       this.isDonated = true
-      // demo of ajax
-      const Axios = require('axios')
-      Axios.get('http://localhost:8080/package.json')
-      .then(function (response) {
-        debugger
-        console.log(response)
-      })
-      .catch(function (error) {
-        console.log(error)
-      })
+      // 捐赠步数
+      // let token = Util.getCookie('token')
+      // let params = {
+      //   token: token
+      // }
+      // Axios.post('..url', params).then(res => {
+      // 刷新数据
+      this.getDonateData()
+      // })
     }
   }
 }

@@ -6,7 +6,7 @@
       <img src="../../assets/run.png" :style="{left: percent + '%'}">
       
     </div>
-    <i v-if="percent >= 100" class="weui-icon-success"></i>
+    <i v-if="percent === 100" class="weui-icon-success"></i>
     <i v-else class="weui-icon-success-circle"></i>
   </div>
 </template>
@@ -40,6 +40,6 @@ export default {
 img{
   position: absolute;
   // margin-left: -30px;
-  margin-top: -11px;
+  margin-top: -16px;
 }
 </style>
