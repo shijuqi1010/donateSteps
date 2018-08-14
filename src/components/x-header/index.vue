@@ -1,9 +1,8 @@
 <template>
   <div class="vux-header">
-    <div class="vux-header-left">
+    <!-- <div class="vux-header-left">
       <slot name="overwrite-left">
         <transition :name="transition">
-          <!-- <a class="vux-header-back" @click.preventDefault v-show="_leftOptions.showBack" @click="onClickBack">{{ typeof _leftOptions.backText === 'undefined' ? $t('back_text') : _leftOptions.backText}}</a> -->
           <a class="vux-header-back" @click.preventDefault v-show="_leftOptions.showBack" @click="onClickBack">{{ typeof _leftOptions.backText === 'undefined' ? '' : _leftOptions.backText}}</a>
         </transition>
         <transition :name="transition">
@@ -11,21 +10,17 @@
         </transition>
       </slot>
       <slot name="left"></slot>
-    </div>
-    <h1 class="vux-header-title" @click="$emit('on-click-title')" v-if="!shouldOverWriteTitle">
+    </div> -->
+    <!-- <h1 class="vux-header-title" @click="$emit('on-click-title')" v-if="!shouldOverWriteTitle">
       <slot>
         <transition :name="transition">
           <span v-show="title">{{title}}</span>
         </transition>
       </slot>
-    </h1>
-    <div class="vux-header-title-area" v-if="shouldOverWriteTitle">
+    </h1> -->
+    <!-- <div class="vux-header-title-area" v-if="shouldOverWriteTitle">
       <slot name="overwrite-title"></slot>
-    </div>
-    <!-- <div class="vux-header-right"> -->
-      <!-- <a class="vux-header-more" @click.preventDefault @click="$emit('on-click-more')" v-if="rightOptions.showMore"></a> -->
-      <!-- <slot name="right"></slot> -->
-    <!-- </div> -->
+    </div> -->
   </div>
 </template>
 
